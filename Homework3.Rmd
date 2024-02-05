@@ -1,0 +1,150 @@
+---
+title: "Homework 3"
+author: "John \"Caleb\" Trelford"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+UT EID: jct3538
+
+GitHub repo: https://github.com/jctrelford/Homework3
+
+```{r global_options, echo=FALSE}
+knitr::opts_chunk$set(warning=FALSE, message = FALSE, tidy=TRUE)
+```
+
+```{r, echo=FALSE, results = 'hide'}
+library(tidyverse)
+library(mosaic)
+```
+
+\newpage
+
+# Problem 1
+
+```{r, echo=FALSE, results = 'hide'}
+creatinine <- read.csv("creatinine.csv")
+```
+
+## A)
+
+```{r, echo=FALSE, results = 'hide'}
+model_creat = lm(creatclear ~ age, data=creatinine)
+coef(model_creat)
+rate55 = 148-0.6*55
+```
+
+We should expect a creatinine clearance rate of `r rate55` mL/minute for a 55-year-old. This is determined by plugging 55 into the linear equation fitted to the data distribution: $148-0.6*55$.
+
+## B)
+
+```{r, echo=FALSE, results = 'hide'}
+coef(model_creat)
+```
+
+The creatinine clearance rate decreases by 0.6 mL/minute per year on average in a population. This number is the slope of the linear equation fitted to the data distribution.
+
+## C)
+
+```{r, echo=FALSE, results = 'hide'}
+rate40 = 148-0.6*40
+rate60 = 148-0.6*60
+resid40 = 135-rate40
+resid60 = 112-rate60
+```
+
+The expected creatinine clearance rate for a 40-year-old is $148-0.6*40=`r rate40`$ mL/minute while the expected creatinine clearance rate for a 60-year-old is $148-0.6*60=`r rate60`$ mL/minute. The 40-year-old is healthier and therefore has a higher creatinine clearance rate for their age because the residual, the difference between the observed and expected creatinine clearance rate, is $135-124=`r resid40`$ mL/minute, which is higher than the residual for the 60-year-old, which is $112-112=`r resid60`$ mL/minute.
+
+\newpage
+
+# Problem 2
+
+```{r, echo=FALSE, results = 'hide'}
+marketmodel <- read.csv("marketmodel.csv")
+
+lm_aapl = lm(AAPL ~ SPY, data=marketmodel)
+lm_goog = lm(GOOG ~ SPY, data=marketmodel)
+lm_mrk = lm(MRK ~ SPY, data=marketmodel)
+lm_jnj = lm(JNJ ~ SPY, data=marketmodel)
+lm_wmt = lm(WMT ~ SPY, data=marketmodel)
+lm_tgt = lm(TGT ~ SPY, data=marketmodel)
+
+```
+
+The beta measures a stock's systematic risk, meaning how easily affected that stock is by changes in the overall economy. This value can be drawn from the slope of a linear regression model comparing SPY, the daily returns of the S&P 500 stock index used to represent the whole market, to the returns for an individual stock. This value, the beta, can be interpreted as a percentage representing the percent change in the returns for an individual stock for a 1% change in the market. Logically, a beta of 1 is average. In terms of risk, a beta above 1 is more risky while a beta less than 1 is less risky. Rarely, the beta value can also be negative. Stocks with lower betas tend to represent companies selling more essential products and services that people need to buy even when the market is doing badly. An investor takes beta into consideration when making investments. They may make riskier investments in stocks with high betas and balance those out with stocks with lower betas for security. Although stocks with negative betas seem to not be worth it when the market is doing well, they are useful insurance in case the market slumps. 
+
+| Ticker symbol | Intercept | Slope | $R^{2}$ |
+|---------|---------|---------|---------|---------|
+| AAPL | `r round(coef(lm_aapl)[1],5)` | `r round(coef(lm_aapl)[2],2)` | `r round(rsquared(lm_aapl),2)` |
+| GOOG | `r round(coef(lm_goog)[1],5)` | `r round(coef(lm_goog)[2],2)` | `r round(rsquared(lm_goog),2)` |
+| MRK | `r round(coef(lm_mrk)[1],5)` | `r round(coef(lm_mrk)[2],2)` | `r round(rsquared(lm_mrk),2)` |
+| JNJ | `r round(coef(lm_jnj)[1],5)` | `r round(coef(lm_jnj)[2],2)` | `r round(rsquared(lm_jnj),2)` |
+| WMT | `r round(coef(lm_wmt)[1],5)` | `r round(coef(lm_wmt)[2],2)` | `r round(rsquared(lm_wmt),2)` |
+| TGT | `r round(coef(lm_tgt)[1],5)` | `r round(coef(lm_tgt)[2],2)` | `r round(rsquared(lm_tgt),2)` |
+
+As seen from the slopes in the table, Apple (AAPL) and Google (GOOG) are relatively risky with beta values of `r round(coef(lm_aapl)[2],2)` and `r round(coef(lm_goog)[2],2)` respectively, while the rest of the stocks, with beta values comfortably below 1, are safer to invest in. Google (GOOG) has the highest $R^{2}$ value, meaning that it is the stock out of the six with the most variation that can be explained by the the return of SPY, while Apple (AAPL) has the lowest $R^{2}$ value.
+
+Wal-Mart (WMT) has the lowest systematic risk with a beta of `r round(coef(lm_wmt)[2],2)` while Apple (AAPL) has the highest systematic risk with a beta of `r round(coef(lm_aapl)[2],2)`.
+
+\newpage
+
+# Problem 3
+
+```{r, echo=FALSE, results = 'hide'}
+covid <- read.csv("covid.csv")
+```
+
+## 1.
+
+```{r, echo=FALSE, results = 'hide'}
+italy <- covid[covid$country == "Italy",]
+
+lm_italy = lm(log(deaths) ~ days_since_first_death, data=italy)
+coef(lm_italy)
+
+italydt = round(70/18.3) # doubling time
+```
+
+In Italy, COVID-19 deaths had a growth rate of about 0.183, meaning an 18.3% increase in deaths on average per day. This translates to a doubling time of about `r italydt` days.
+
+## 2. 
+
+```{r, echo=FALSE, results = 'hide'}
+spain <- covid[covid$country == "Spain",]
+
+lm_spain = lm(log(deaths) ~ days_since_first_death, data = spain)
+coef(lm_spain)
+
+spaindt = round(70/27.6) # doubling time
+```
+
+In Spain, COVID-19 deaths had a growth rate of about 0.276, meaning a 27.6% increase in deaths on average per day. This translates to a doubling time of about `r spaindt` days.
+
+## 3. 
+
+```{r, echo=FALSE}
+ggplot() +
+  geom_line(data = italy, aes(x=days_since_first_death, y=log(deaths), color = "Italy")) +
+  geom_line(data = spain, aes(x=days_since_first_death, y=log(deaths), color = "Spain")) +
+  labs(x="Days since first death",
+       title="Daily deaths and time",
+       color = "Country") + 
+  scale_color_manual(name = "Country", values = c("Italy" = "green", "Spain" = "red"))
+```
+
+\newpage
+
+# Problem 4
+
+```{r, echo=FALSE, results = 'hide'}
+milk <- read.csv("milk.csv")
+```
+
+```{r, echo=FALSE, results = 'hide'}
+lm_milk = lm(log(sales) ~ log(price), data=milk)
+coef(lm_milk)
+```
+
+The estimated price elasticity of demand for milk is -1.62, meaning that when the price of milk increases by 1%, we expect the number of consumers willing to purchase milk to decrease by 1.62%. To determine this, I identified the slope of the fitted linear equation for the distribution with both price and sales on a logarithmic scale.
